@@ -112,6 +112,7 @@
                   \end{align}
                 $$
           </div>
+            <p>&nbsp;</p>
           <div>
               <ul style="line-height:2.0;">
                 <li>Displacements $u_0, u_1, u_2, \cdots, u_k \in V_0, V_1, V_2,\cdots, V_k$</li>
@@ -132,6 +133,7 @@
 		    <li>$V=V_0 \times V_1 \times V_2 \times \cdots  \times V_k$</li>
                     <li>$Q=Q_1 \times Q_2 \times \cdots \times Q_k$</li>
 		  </ul>
+
 		  <li>Restricting to $V_h\subset V, Q_h\subset Q$ yields linear system</li>
 			$$
 			    \begin{bmatrix}
@@ -189,12 +191,12 @@
 		
           <!-- FIFTH -->
           <section data-state="header5">
-	     <style>.header5 header:after { content: "CONSTRUCTING FINITE DIMENSIONAL SPACES"; }</style>
+	     <style>.header5 header:after { content: "CONSTRUCTION OF FINITE DIMENSIONAL SPACES"; }</style>
 		<ul style="line-height:2.0;">
 		  <li>Spaces $V_r, Q_r, r=1, 2, \cdots, k$ constructed from non-local basis functions:</li>
 		    <ul style="line-height:2.0;">
-		      <li>$\phi_k(s)=\sum_k c_{ij}l_k(s)$, clamped boundary conditions</li>
-		      <li>$\phi_k(s)=\sqrt{\frac{2}{\pi}}\sin(kx)$, simply-supported boundary conditions</li>
+		      <li>$\phi_k(s)=\sum_k c_{kj}l_j(s)$, clamped boundary conditions</li>
+		      <li>$\phi_k(s)=\sqrt{\frac{2}{\pi}}\sin(ks)$, simply-supported boundary conditions</li>
                     </ul>
 		  <li>Space of plate deformation as tensor product $\psi_{i,j}(x, y)=\phi_i(x)\phi_j(y)$</li>
 		  <li>With all spaces spanned by the same functions linear system requires:</li>
@@ -208,7 +210,7 @@
 
           <!-- SIXTH -->
          <section data-state="header6">
-	     <style>.header6 header:after { content: "EXAMPLE-BASIS EVALUATION"; }</style>
+	     <style>.header6 header:after { content: "EXAMPLE - EVALUATION OF BASIS"; }</style>
 	     <pre class="prettyprint" data-lang="python" skin="desert" style="height: 550px; overflow: auto">
 def sine_basis(n, symbol='x'):
     '''
@@ -262,7 +264,7 @@ def sine_function(F):
 
           <!-- SEVENTH -->
          <section data-state="header7">
-	     <style>.header7 header:after { content: "EXAMPLE-BLOCK ASSEMBLY AND INTEGRATION"; }</style>
+	     <style>.header7 header:after { content: "EXAMPLE-ASSEMBLY OF MATRIX BLOCKS AND INTEGRATION"; }</style>
 	     <pre class="prettyprint" data-lang="python" skin="desert" style="height: 550px; overflow: auto">
 def assemble_mat_blocks(self):
     '''Assembled individual blocks of the system matrix.'''
@@ -350,7 +352,20 @@ class Quad1d(object):
         return np.sum(f_point_values*self.weights)
 	     </pre>
 	  </section>
+
+ 	  <!-- 8 sparsity -->
+          <section data-state="header8">
+	       <style>.header8 header:after { content: "SPARSITY OF LINEAR SYSTEM WITH TWO BEAMS"; }</style>
+	       <div style="float: left">
+	       <object type="image/svg+xml" data="images/svg/shen_spy.svg" width="350" height="550">?</object>
+    	       </div>
+	       <div style="float: right">
+	       <object type="image/svg+xml" data="images/svg/sine_spy.svg" width="350" height="550">?</object>
+    	       </div>
+	  </section>
 	</section>
+	<!-- 9 3d solution -->
+	<!-- 10 constrains -->
 
 	<!--<section>
 	<div style="float: left">
@@ -371,30 +386,86 @@ class Quad1d(object):
           <section>
             <h2>PRECONDITIONING</h2>
 	  </section>
-
-	  <section>
-	    <img src="images/png/domain-3.png" height="250" width="250" style="border: 0px">
-	  </section>
-
-	  <section>
+	
+	 <!-- 11 no precond -->
+         <section data-state="header_1">
+	     <style>.header_1 header:after { content: "SCALING OF LINEAR SYSTEMS WITHOUT PRECONDITIONER"; }</style>
 	    <object type="image/svg+xml" data="images/svg/no_precond.svg">?</object>
+	    <ul style="line-height:1.25;">
+	      <li>Exponential growth of condition number, $\kappa$, for systems of both basis</li>
+	      <li>The increase is due to $\lambda_{\text{min}}$ decreasing</li>
+	      <li>Largest eigenvalues, $\lambda_{\text{max}}$, remain stable with polynomial degree $n$</li>
+            </ul>
 	  </section>
 
-	  <section>
+	 <!-- 12 how precond -->
+         <section data-state="header_2">
+	     <style>.header_2 header:after { content: "POSSIBLE PRECONDITIONER"; }</style>
+	    <ul style="line-height:1.25;">
+	      <li>Block-diagonal preconditioner</li>
+			$$
+			    \begin{bmatrix}
+			      \mathbb{N}_V & 0 \\
+			      0 & \mathbb{N}_Q
+			      \end{bmatrix}^{-1}
+			    \begin{bmatrix}
+			      \mathbb{A} & \mathbb{B} \\
+			      \mathbb{B}^{\text{T}} & 0
+			    \end{bmatrix}
+			    \,
+			    \begin{bmatrix}
+			      \mathbf{U} \\
+			      \mathbf{P}
+			    \end{bmatrix}
+			    =
+			    \begin{bmatrix}
+			      \mathbb{N}_V & 0 \\
+			      0 & \mathbb{N}_Q
+			      \end{bmatrix}^{-1}
+			    \begin{bmatrix}
+			      \mathbf{b}\\
+			      0
+			    \end{bmatrix}
+			$$
+	      <li>Preconditioner for $Q-$block based on eigenvalue problem for Schur-complement</li>
+	      $$
+		\Bmat^{\text{T}}\mathbb{A}^{-1}\Bmat\Pvec=\beta\mathbb{N_Q}\Pvec
+	      $$
+	      <li>Matrix $\mathbb{N}_Q$ obtained from eigenvalue problem
+		      $\mathbb{A}_Q\mathbb{E}_Q=\mathbb{M}_Q\mathbb{E}_Q\Lambda$
+	      as</li>
+	      $$
+		\mathbb{N}_Q=(\mathbb{M}_Q\mathbb{E}_Q)\Lambda^{-1}(\mathbb{M}_Q\mathbb{E}_Q)^{\text{T}}
+	      $$
+	      <li>We guess $\mathbb{N}_V=\Amat$</li>
+            </ul>
+	  </section>
+
+	 <!-- 13 with precond -->
+         <section data-state="header_3">
+	     <style>.header_3 header:after { content: "SCALING OF PRECONDITIONED LINEAR SYSTEMS"; }</style>
 	    <object type="image/svg+xml" data="images/svg/with_precond.svg">?</object>
+	    <ul style="line-height:1.25;">
+	      <li>Condition number of systems due to both basis increases linearly</li>
+	      <li>Smallest eigenvalues, $\lambda_{\text{min}}$, are stable</li>
+	      <li>Largest eigenvalues, $\lambda_{\text{max}}$, grow linearly with polynomial degree $n$</li>
+            </ul>
 	  </section>
 	</section>
 
+	<!-- 14 conclusions -->
         <section>
           <section>
-            <h3>CONCLUSIONS</h3>
+            <h2>CONCLUSIONS</h2>
 	  </section>
-	<section>
+	</section>
 
 	<!-- FINISH -->
 	<section>
-	  <h2> Thank you for your attention.</h2>
-	  <h3> Questions?</h3>
+	  <section>
+	    <h2> Thank you for your attention.</h2>
+	    <h3> Questions?</h3>
+	  </section>
 	</section>
 
 	<script src="lib/js/head.min.js"></script>
