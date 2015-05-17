@@ -357,30 +357,49 @@ class Quad1d(object):
           <section data-state="header8">
 	       <style>.header8 header:after { content: "SPARSITY OF LINEAR SYSTEM WITH TWO BEAMS"; }</style>
 	       <div style="float: left">
-	       <object type="image/svg+xml" data="images/svg/shen_spy.svg" width="350" height="550">?</object>
+		       <img src="images/png/sine_spy.png" width="550" height="550">
     	       </div>
 	       <div style="float: right">
-	       <object type="image/svg+xml" data="images/svg/sine_spy.svg" width="350" height="550">?</object>
+		       <img src="images/png/shen_spy.png" width="550" height="550">
     	       </div>
+	       <ul style="line-height:1.25;">
+		<li>Sine basis(left) yields diagonal $\Amat$</li>
+	        <li>Polynomial basis(right) yields penta-block-diagonal $\Amat_0$</li>
+	        <li>Blocks of constraints are dense</li>
+	       </ul>
+	  </section>
+	  
+	  <!-- 9 3d solution -->
+          <section data-state="header9">
+	       <style>.header9 header:after { content: "DEFORMATION OF SYSTEM WITH TWO BEAMS"; }</style>
+	       <div style="float: left">
+		       <img src="images/png/sine_3d.png" width="550" height="550">
+    	       </div>
+	       <div style="float: right">
+		       <img src="images/png/shen_3d.png" width="550" height="550">
+    	       </div>
+	       <ul style="line-height:1.25;">
+		<li>FIXME</li>
+	        <li>TOMORROW</li>
+	       </ul>
+	  </section>
+
+
+	  <!-- 10 constraints -->
+          <section data-state="header10">
+	       <style>.header10 header:after { content: "ERROR IN CONSTRAINTS"; }</style>
+	       <div style="float: left">
+		       <img src="images/png/sine_constraints.png" width="550" height="550">
+    	       </div>
+	       <div style="float: right">
+		       <img src="images/png/shen_constrains.png" width="550" height="550">
+    	       </div>
+	       <ul style="line-height:1.25;">
+		<li>With polynomial degree $n=10$ constraints are relatively well respected</li>
+	        <li>The error of sine-solution(left) is visibly larger</li>
+	       </ul>
 	  </section>
 	</section>
-	<!-- 9 3d solution -->
-	<!-- 10 constrains -->
-
-	<!--<section>
-	<div style="float: left">
-	    <object type="image/svg+xml" data="images/svg/sine_3d.svg"
-		    width="450" height="450">?</object>
-    	  </div>
-
-	  <div style="float: right">
-            <figure>
-	    <object type="image/svg+xml" data="images/svg/shen_3d.svg"
-		    width="450" height="450">?</object>
-	    <figcaption>foo</figcaption>
-	    </figure>
-          </div>
-	</section>-->
 
         <section>
           <section>
