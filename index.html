@@ -7,7 +7,7 @@
     <title>reveal.js - The HTML Presentation Framework</title>
 
     <meta name="description" content="Bendpy @ MekIT">
-    <meta name="author" content="August Johansson and Anders Logg">
+    <meta name="author" content="Mikael Mortensen and Miroslav Kuchta and Kent-Andre Mardal">
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
@@ -25,14 +25,15 @@
 		TeX: {Macros: {Amat: '\\mathbb{A}',
                    Bmat: '\\mathbb{B}',
                    bvec: '\\mathbf{b}',
-			             uvec: '\\mathbf{u}',
-			             Uvec: '\\mathbf{U}',
-			             Pvec: '\\mathbf{P}',
+	           uvec: '\\mathbf{u}',
+	           Uvec: '\\mathbf{U}',
+	           Pvec: '\\mathbf{P}',
                    inner: ['\(#1, #2\)', 2],
                    ainner: ['a\(#1, #2\)', 2],
                    binner: ['b\(#1, #2\)', 2],
+                   deriv: ['\\frac{\\mathrm{d} #1}{\\mathrm{d}#2}', 2],
                    Linner: ['L\(#1\)', 1]}
-		     }
+		}
 	  });
     </script>
     <script type="text/javascript"
@@ -45,107 +46,355 @@
   <body>
 
     <div class="reveal">
-
+	<header style="position: absolute; top: 25px; left: 100px; z-index:500;
+	       	font-size:24px"></header>
+	    
       <!-- Any section element inside of this container is displayed as a slide -->
       <div class="slides">
-
-	<section>
-		<h2>Bend|P|y</h2>
-		<h3>Python Framework for Computing Bending of Complex Plate-Beam
-			<br>
-			Systems</h3>
-          <p>&nbsp;</p>
-	  <p>Mikael Mortensen, <i>Miroslav Kuchta</i> and Kent-Andre Mardal
-          </p>
-          <p>&nbsp;</p>
-          <p><small>MekIT 2015</small></p>
-          <p>&nbsp;</p>
-          <p><small>University of Oslo<br>Simula Research Laboratory</small></p>
-	</section>
-
+	      <section>
+		      <h2>Bend|P|y</h2>
+            <h3>
+            Python Framework for Computing Bending of Complex Plate-Beam Systems
+            </h3>
+            <p>&nbsp;</p>
+	          <p>Mikael Mortensen, <i>Miroslav Kuchta</i> and Kent-Andre Mardal</p>
+            <p>&nbsp;</p>
+            <p><small>MekIT 2015</small></p>
+            <p>&nbsp;</p>
+            <p><small>University of Oslo<br>Simula Research Laboratory</small></p>
+        </section>
+        
+        <section>
           <section>
-      <p >
-      <pre class="prettyprint" data-lang="python" skin="desert" style="font-size:40px">
-      # Hello world in Python
-      for i in range(10):
-          print 'Hello world!'
-      </pre>
-      </p>
+            <h2>INTRODUCTION</h2>
+          </section>
+          <!-- FIRST -->
+          <section data-state="header1">
+	     <style>.header1 header:after { content: "WHAT DOES BEND|P|Y SOLVE AND WHY"; }</style>
+
+            <div style="float: left; width: 33%;">
+            <img src="images/png/domain-1.png" height="350" width="350" style="border: 0px">
+            </div>
+            <div style="float: right; widht=77%;">
+              $$
+                  \begin{align}
+                    E_0\Delta^2u_0 &= f\quad\text{ in }\Omega,\\
+                    E_r\deriv{^4 u_r}{s^4} &= 0\quad\text{ on }\mathcal{I},\\
+                    u \circ F_r&= u_r\quad\text{ on }\mathcal{I}\\
+                  \end{align}
+               $$
+              <p>
+              <ul style="line-height:2.0;">
+                <li>Beam described by $F_r\!:\!\mathcal{I}\!\mapsto\!\Gamma_r$ with Jacobian $J_r$
+                <li>Coupling physical processes on <i>2d-1d</i> domains</li>
+		<li>Design preconditioners for efficient iterative<br> methods</li>
+              </ul>
+              </p>
+            </div>
           </section>
 
-          <section>
-            <img src="images/prec_shen_spectru.pdf">
+          <!-- SECOND -->
+          <section data-state="header2">
+	     <style>.header2 header:after { content: "GOVERNING EQUATIONS"; }</style>
+            <div>
+                $$
+                  \begin{align}
+                    \label{eq:system}
+                    E_0\displaystyle\int_{\Omega}\Delta u_0\,\Delta v_0-
+                    \sum_{r=1}^k\int_{\mathcal{I}}v_0\lambda_r J_r &=\displaystyle\int_{\Omega}f
+                    v_0\quad\forall v_0\in V_0,& \\
+                    E_r\displaystyle\int_{\mathcal{I}}
+                    \deriv{^2u_r}{s^2}\deriv{^2v_r}{s^2}J_r^{-3} +
+                  \int_{\mathcal{I}} u_r \lambda_r J_r &= 0\quad\forall v_r\in V_r, r=1,
+                    2\cdots, k,&\\
+                  \int_{\mathcal{I}}\left(u_r-u_0\right)\mu_r J_r &= 0\quad\forall \mu_r\in Q_r,
+                    r=1, 2\cdots, k&\\
+                  \end{align}
+                $$
+          </div>
+          <div>
+              <ul style="line-height:2.0;">
+                <li>Displacements $u_0, u_1, u_2, \cdots, u_k \in V_0, V_1, V_2,\cdots, V_k$</li>
+                <li>Lagrange multipliers $\lambda_0, \lambda_1, \lambda_2,\cdots, \lambda_k \in Q_0, Q_1, Q_2, \cdots, Q_k$</li>
+              </ul>
+          </div>
+          </section>
+        
+          <!-- THIRD -->
+          <section data-state="header3">
+	     <style>.header3 header:after { content: "ABSTRACTIONS"; }</style>
+              <ul style="line-height:2.0;">
+		      <li>Saddle point problem can be recast into abstract
+			      problem:<br> Find $(u, p)\in V\times Q$</li>
+ 		  $$\quad\ainner{u}{v} + \binner{\lambda}{v} + \binner{\mu}{u} =
+		  \Linner{v}\text{ for each } (v, \mu)\in V\times Q$$
+	      	  <ul style="line-height:2.0;">
+		    <li>$V=V_0 \times V_1 \times V_2 \times \cdots  \times V_k$</li>
+                    <li>$Q=Q_1 \times Q_2 \times \cdots \times Q_k$</li>
+		  </ul>
+		  <li>Restricting to $V_h\subset V, Q_h\subset Q$ yields linear system</li>
+			$$
+			    \begin{bmatrix}
+			      \mathbb{A} & \mathbb{B} \\
+			      \mathbb{B}^{\text{T}} & 0
+			    \end{bmatrix}
+			    \,
+			    \begin{bmatrix}
+			      \mathbf{U} \\
+			      \mathbf{P}
+			    \end{bmatrix}
+			    =
+			    \begin{bmatrix}
+			      \mathbf{b}\\
+			      0
+			    \end{bmatrix}
+			$$
+                   </ul>
+	      </ul>
           </section>
 
-	<section>
-		$$
-  \ainner{u}{v} + \binner{\lambda}{v} + \binner{\mu}{u} = \Linner{v}\quad\forall
-		$$
-	</section>
-
-	  <section>
-		  $$
-	    \begin{bmatrix}
-	      \mathbb{A}^{-1} & 0 \\
-	      0 & \mathbb{N}^{-1}
-	    \end{bmatrix}
-	    $$
-	  </section>
-
-	  <section>
-		$$		  
-	    \Bmat^{\text{T}}\Amat^{-1}\Bmat\Pvec = \beta\mathbb{N}\Pvec,
-	    $$
-	  </section>
-
-	  <section>
-		$$
-		    \begin{bmatrix}
-		      \mathbb{A} & \mathbb{B} \\
-		      \mathbb{B}^{\text{T}} & 0
-		    \end{bmatrix}
-		    \,
-		    \begin{bmatrix}
-		      \mathbf{U} \\
-		      \mathbf{P}
-		    \end{bmatrix}
-		    =
-		    \begin{bmatrix}
-		      \mathbf{b}\\
-		      0
-		    \end{bmatrix},
-		$$
-	  </section>
-
-	  <section>
-		  $$
-		    \mathbb{A}=
+          <!-- FOURTH -->
+          <section data-state="header4">
+	     <style>.header4 header:after { content: "ABSTRACTIONS"; }</style>
+		  $$\mathbb{A}=
 		    \begin{bmatrix}
 		      \mathbb{A}^0  &   &  &\\
 				    & \mathbb{A}^1 &  &\\
 				    &   &   \ddots    & \\
 				    &   &   & \mathbb{A}^k\\
-		    \end{bmatrix},
-		    $$
+		    \end{bmatrix}
+		    \quad
+		  \mathbb{B}=
+		    \begin{bmatrix}
+		      \mathbb{C}^1 & \mathbb{C}^2 & \cdots & \cdots & \mathbb{C}^k\\
+		      \mathbb{M}^1   &        0       & \cdots & \cdots &        0      \\
+			   0         & \mathbb{M}^2   &    0   & \cdots &   \vdots      \\
+			 \vdots      &       0        & \ddots & \ddots &   \vdots      \\
+			 \vdots      &     \vdots      & \ddots & \ddots &       0      \\
+		      0         &  \cdots        & \cdots & 0      &   \mathbb{M}^k     \\
+		    \end{bmatrix}
+    		$$
+		<ul style="line-height:2.0;">
+		  <li>Submatrices $\mathbb{A}^r$ describe bending energy of plate and beams</li>
+		  <li>Submatrices $\mathbb{C}^r$ enforce constraint on the plate</li>
+		  <li>Submatrices $\mathbb{M}^r$ enforce constraint on the beams</li>
+              </ul>
+          </section>
+	</section>
+
+        <section>
+          <section>
+            <h2>IMPLEMENTATION</h2>
+	  </section>
+		
+          <!-- FIFTH -->
+          <section data-state="header5">
+	     <style>.header5 header:after { content: "CONSTRUCTING FINITE DIMENSIONAL SPACES"; }</style>
+		<ul style="line-height:2.0;">
+		  <li>Spaces $V_r, Q_r, r=1, 2, \cdots, k$ constructed from non-local basis functions:</li>
+		    <ul style="line-height:2.0;">
+		      <li>$\phi_k(s)=\sum_k c_{ij}l_k(s)$, clamped boundary conditions</li>
+		      <li>$\phi_k(s)=\sqrt{\frac{2}{\pi}}\sin(kx)$, simply-supported boundary conditions</li>
+                    </ul>
+		  <li>Space of plate deformation as tensor product $\psi_{i,j}(x, y)=\phi_i(x)\phi_j(y)$</li>
+		  <li>With all spaces spanned by the same functions linear system requires:</li>
+		    <ul style="line-height:2.0;">
+		      <li>evaluating of basis - $\mathbb{C}^r$</li>
+		      <li>mass matrix of basis - $\mathbb{M}^r$</li>
+		      <li>bending and stiffness matrices of basis - $\mathbb{A}^r$</li>
+                    </ul>
+              </ul>
+	  </section>
+
+          <!-- SIXTH -->
+         <section data-state="header6">
+	     <style>.header6 header:after { content: "EXAMPLE-BASIS EVALUATION"; }</style>
+	     <pre class="prettyprint" data-lang="python" skin="desert" style="height: 550px; overflow: auto">
+def sine_basis(n, symbol='x'):
+    '''
+    Functions sin(k*x), k = 1, 2, ....n, normalized to have L^2 norm over [0, pi].
+    Note that (sin(k*x), k**2) are all the solutions of 
+
+        -u`` = lambda u in (0, pi)
+        u(0) = u(pi) = 0
+    '''
+    x = Symbol(symbol)
+    return [sin(k*x)*sqrt(2/pi) for k in range(1, n+1)]
+
+
+def mass_matrix(n):
+    '''inner(u, v) for u, v in sine_basis(n).'''
+    return eye(n) 
+
+
+def stiffness_matrix(n):
+    '''inner(u`, v`) for u, v in sine_basis(n).'''
+    return diags(np.arange(1, n+1)**2, 0, shape=(n, n))
+
+
+def bending_matrix(n):
+    '''inner(u``, v``) for u, v in sine_basis(n).'''
+    return diags(np.arange(1, n+1)**4, 0, shape=(n, n))
+
+
+def sine_function(F):
+    '''
+    Return a linear combination of len(F_vec) sine basis functions with
+    coefficients given by F_vec.
+    '''
+    if len(F.shape) == 1:
+        basis = sine_basis(F.shape[0], 'x')
+        return function(basis, F)
+
+    elif len(F.shape) == 2:
+        basis_x = sine_basis(F.shape[0], 'x')
+        basis_y = sine_basis(F.shape[1], 'y')
+        basis = tensor_product([basis_x, basis_y])
+
+        # Collapse to coefs by row
+        F = F.flatten()
+        return function(basis, F)
+
+    else:
+        raise NotImplementedError
+	     </pre>
+	  </section>
+
+          <!-- SEVENTH -->
+         <section data-state="header7">
+	     <style>.header7 header:after { content: "EXAMPLE-BLOCK ASSEMBLY AND INTEGRATION"; }</style>
+	     <pre class="prettyprint" data-lang="python" skin="desert" style="height: 550px; overflow: auto">
+def assemble_mat_blocks(self):
+    '''Assembled individual blocks of the system matrix.'''
+    
+    # --A: 2d bending + 1d bendings with Jac, all scaled by matieral
+    self._Amat_blocks = []
+    
+    # Biharmonic 2d
+    n = self.n_vector[0]
+    B = shen.bending_matrix(n)
+    A = shen.stiffness_matrix(n)
+    M = shen.mass_matrix(n)
+    
+    mat0 = kron(B, M) 
+    mat1 = 2*kron(A, A)
+    mat2 = kron(M, B)
+    mat = mat0 + mat1 + mat2
+    self._Amat_blocks.append(mat)
+    
+    # Biharmonic 1d
+    for n in self.n_vector[1:]:
+        self._Amat_blocks.append(shen.bending_matrix(n))
+    
+    # Now materials:
+    for i, coef in enumerate(self.materials):
+        self._Amat_blocks[i] *= coef
+    
+    # Finally jacobians
+    for i, beam in enumerate(self.beams, 1):
+        # four derivs + 1*dx
+        self._Amat_blocks[i] *= float(beam.Jac**(-3))
+    
+    # -- D: Just mass matrices scaled by Jacobian
+    self._Dmat_blocks = [shen.mass_matrix(n) for n in self.n_vector[1:]]
+    for i, beam in enumerate(self.beams):
+        self._Dmat_blocks[i] *= float(beam.Jac)
+    
+    # -- C: plate restricted ...
+    n = self.n_vector[0]
+    basis_x = shen.shen_cb_basis(n, 'x')
+    basis_y = shen.shen_cb_basis(n, 'y')
+    plate_basis = tensor_product([basis_x, basis_y])
+    
+    x, s = symbols('x, s')
+    n_rows = n**2
+    self._Cmat_blocks = []
+    for n_cols, beam in zip(self.m_vector, self.beams):
+        C = np.zeros((n_rows, n_cols))
+        # Setup basis for involved spaces 
+        plate_basis_r = [beam.restrict(v) for v in plate_basis]
+        beam_basis = shen.shen_cb_basis(n, 's')
+        # Some heuristics for quadrature
+        n_quad = n**2 + n_cols + 3
+        Q1 = Quad1d(n_quad)
+        # Build the matrix
+        for row, u in enumerate(plate_basis_r):
+            for col, v in enumerate(beam_basis):
+                f = u*v*beam.Jac
+                f = f.subs(s, x)
+                C[row, col] = Q1(f, [-1, 1])
+    
+	self._Cmat_blocks.append(csr_matrix(C))
+
+
+class Quad1d(object):
+    '''One dimensional integration with GL quadrature.'''
+    def __init__(self, N):
+        '''Quadrature formulat using N points.'''
+        self.points, self.weights = leggauss(N)
+
+    def __call__(self, f, domain):
+        '''Integrate symbolic f over domain.'''
+        a, b = domain
+        assert a < b
+
+        # Map to reference [-1, 1]. 
+        x = Symbol('x')
+        pull_back = a*(1-x)/2 + b*(1+x)/2
+        Jacobian = (b-a)/2
+        f = f.subs(x, pull_back)*Jacobian
+
+        f = lambdify(x, f, 'numpy')
+
+        f_point_values = f(self.points)
+        return np.sum(f_point_values*self.weights)
+	     </pre>
+	  </section>
+	</section>
+
+	<!--<section>
+	<div style="float: left">
+	    <object type="image/svg+xml" data="images/svg/sine_3d.svg"
+		    width="450" height="450">?</object>
+    	  </div>
+
+	  <div style="float: right">
+            <figure>
+	    <object type="image/svg+xml" data="images/svg/shen_3d.svg"
+		    width="450" height="450">?</object>
+	    <figcaption>foo</figcaption>
+	    </figure>
+          </div>
+	</section>-->
+
+        <section>
+          <section>
+            <h2>PRECONDITIONING</h2>
 	  </section>
 
 	  <section>
-		  $$
-    \mathbb{B}=
-    \begin{bmatrix}
-      \mathbb{C}^1 & \mathbb{C}^2 & \cdots & \cdots & \mathbb{C}^k\\
-      \mathbb{M}^1   &        0       & \cdots & \cdots &        0      \\
-           0         & \mathbb{M}^2   &    0   & \cdots &   \vdots      \\
-         \vdots      &       0        & \ddots & \ddots &   \vdots      \\
-         \vdots      &     \vdots      & \ddots & \ddots &       0      \\
-      0         &  \cdots        & \cdots & 0      &   \mathbb{M}^k     \\
-    \end{bmatrix}.
-    		$$
+	    <img src="images/png/domain-3.png" height="250" width="250" style="border: 0px">
 	  </section>
 
+	  <section>
+	    <object type="image/svg+xml" data="images/svg/no_precond.svg">?</object>
+	  </section>
+
+	  <section>
+	    <object type="image/svg+xml" data="images/svg/with_precond.svg">?</object>
+	  </section>
+	</section>
+
+        <section>
+          <section>
+            <h3>CONCLUSIONS</h3>
+	  </section>
 	<section>
-		<h3> Thank you for your attention.</h3>
-		<h4> Questions?</h4>
+
+	<!-- FINISH -->
+	<section>
+	  <h2> Thank you for your attention.</h2>
+	  <h3> Questions?</h3>
 	</section>
 
 	<script src="lib/js/head.min.js"></script>
@@ -159,8 +408,11 @@
 	  history: true,
 	  center: true,
 
+    width: 1200, //###!
+    height: 800,
+
 	  theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
-	  transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+	  transition: Reveal.getQueryHash().transition || 'none', // default/cube/page/concave/zoom/linear/fade/none
 
 	  // Parallax scrolling
 	  // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
