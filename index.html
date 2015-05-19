@@ -7,7 +7,7 @@
     <title>reveal.js - The HTML Presentation Framework</title>
 
     <meta name="description" content="Bendpy @ MekIT">
-    <meta name="author" content="Mikael Mortensen and Miroslav Kuchta and Kent-Andre Mardal">
+    <meta name="author" content="Miroslav Kuchta and Mikael Morten and Kent-Andre Mardal">
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
@@ -57,7 +57,7 @@
             Python Framework for Computing Bending of Complex Plate-Beam Systems
             </h3>
             <p>&nbsp;</p>
-	          <p>Mikael Mortensen, <i>Miroslav Kuchta</i> and Kent-Andre Mardal</p>
+	          <p><i>Miroslav Kuchta</i>, Mikael Mortensen, and Kent-Andre Mardal</p>
             <p>&nbsp;</p>
             <p><small>MekIT 2015</small></p>
             <p>&nbsp;</p>
@@ -116,7 +116,7 @@
           <div>
               <ul style="line-height:2.0;">
                 <li>Displacements $u_0, u_1, u_2, \cdots, u_k \in V_0, V_1, V_2,\cdots, V_k$</li>
-                <li>Lagrange multipliers $\lambda_0, \lambda_1, \lambda_2,\cdots, \lambda_k \in Q_0, Q_1, Q_2, \cdots, Q_k$</li>
+                <li>Lagrange multipliers $\lambda_1, \lambda_2,\cdots, \lambda_k \in Q_1, Q_2, \cdots, Q_k$</li>
               </ul>
           </div>
           </section>
@@ -191,12 +191,13 @@
 		
           <!-- FIFTH -->
           <section data-state="header5">
-	     <style>.header5 header:after { content: "CONSTRUCTION OF FINITE DIMENSIONAL SPACES"; }</style>
+	     <style>.header5 header:after { content: "CONSTRUCTION OF FINITE DIMENSIONAL SPACES FOR GALERKIN METHOD"; }</style>
 		<ul style="line-height:2.0;">
-		  <li>Spaces $V_r, Q_r, r=1, 2, \cdots, k$ constructed from non-local basis functions:</li>
+		  <li>Spaces $(V_h)_r, (Q_h)_r, r=1, 2, \cdots, k$ constructed from non-local basis functions:</li>
 		    <ul style="line-height:2.0;">
-		      <li>$\phi_k(s)=\sum_k c_{kj}l_j(s)$, clamped boundary conditions</li>
-		      <li>$\phi_k(s)=\sqrt{\frac{2}{\pi}}\sin(ks)$, simply-supported boundary conditions</li>
+		      <li>$\phi_k(s)=\sum_j c_{kj}l_j(s)$, Legendre polynomials, clamped boundary conditions</li>
+		      <li>$\phi_k(s)=\sqrt{\frac{2}{\pi}}\sin(ks)$, eigenfunctions
+			      of $\Delta$ and $\Delta^2$, simply-supported boundary conditions</li>
                     </ul>
 		  <li>Space of plate deformation as tensor product $\psi_{i,j}(x, y)=\phi_i(x)\phi_j(y)$</li>
 		  <li>With all spaces spanned by the same functions linear system requires:</li>
@@ -260,6 +261,10 @@ def sine_function(F):
     else:
         raise NotImplementedError
 	     </pre>
+	       <ul style="line-height:1.25;">
+		<li>Basis functions are symbolic via SymPy</li>
+		<li>All the matrices due to basis of sines are diagonal</li>
+	       </ul>
 	  </section>
 
           <!-- SEVENTH -->
@@ -350,7 +355,38 @@ class Quad1d(object):
 
         f_point_values = f(self.points)
         return np.sum(f_point_values*self.weights)
+
+
+class Beam(object):
+    '''Create the beam from mapping'''
+    def __init__(self, F):
+        # Geometry
+        d = len(F)
+        assert d == 2, 'Not a 2d vector mapping'
+        self.d = d
+        # The mapping
+        self.F = F
+        # Compute the jacobian |d_x| = |d_F/d_s| * |d_s|
+        Jac = 0
+        for i in range(d):
+            Jac += F[i].diff(Symbol('s'), 1)**2
+        Jac = sqrt(Jac)
+        # Make sure this is not degenerate
+        assert quad(lambdify(Symbol('s'), Jac**2), [-1, 1]) > 0
+        self.Jac = Jac
+
+
+    def restrict(self, u):
+        'Restrict function from plate variables to beam variables.'
+        # So we go from x, y sa indep to x(s), y(s)
+        xy = symbols('x, y')
+        assert all(var in u.atoms() for var in xy)
+        return u.subs({(var, self.chi[i]) for i, var in enumerate(xy)})
 	     </pre>
+	       <ul style="line-height:1.25;">
+		<li>$\mathbb{C}^r$ defined via $\int_{\mathcal{I}}\left(v_0\circ F_r\right)\lambda_r J_r$</li>
+		<li>Symbolic integrands transformed to (vectorized) functions</li>
+	       </ul>
 	  </section>
 
  	  <!-- 8 sparsity -->
@@ -379,8 +415,8 @@ class Quad1d(object):
 		       <img src="images/png/shen_3d.png" width="550" height="550">
     	       </div>
 	       <ul style="line-height:1.25;">
-		<li>FIXME</li>
-	        <li>TOMORROW</li>
+		<li>Solutions with sine basis(left) and polynomials(right) are reasonable</li>
+	        <li>Convergence study missing at the moment</li>
 	       </ul>
 	  </section>
 
@@ -422,6 +458,7 @@ class Quad1d(object):
 	     <style>.header_2 header:after { content: "POSSIBLE PRECONDITIONER"; }</style>
 	    <ul style="line-height:1.25;">
 	      <li>Block-diagonal preconditioner</li>
+            <p style="line-height:0.20">&nbsp;</p>
 			$$
 			    \begin{bmatrix}
 			      \mathbb{N}_V & 0 \\
@@ -446,16 +483,22 @@ class Quad1d(object):
 			      0
 			    \end{bmatrix}
 			$$
-	      <li>Preconditioner for $Q-$block based on eigenvalue problem for Schur-complement</li>
+            <p style="line-height:0.20">&nbsp;</p>
+	      <li>Preconditioner for $Q-$block based on eigenvalue problem for
+		      Schur-complement, control over smallest eigenvalues</li>
+            <p style="line-height:0.20">&nbsp;</p>
 	      $$
 		\Bmat^{\text{T}}\mathbb{A}^{-1}\Bmat\Pvec=\beta\mathbb{N_Q}\Pvec
 	      $$
+            <p style="line-height:0.20">&nbsp;</p>
 	      <li>Matrix $\mathbb{N}_Q$ obtained from eigenvalue problem
 		      $\mathbb{A}_Q\mathbb{E}_Q=\mathbb{M}_Q\mathbb{E}_Q\Lambda$
 	      as</li>
+            <p style="line-height:0.20">&nbsp;</p>
 	      $$
 		\mathbb{N}_Q=(\mathbb{M}_Q\mathbb{E}_Q)\Lambda^{-1}(\mathbb{M}_Q\mathbb{E}_Q)^{\text{T}}
 	      $$
+            <p style="line-height:0.20">&nbsp;</p>
 	      <li>We guess $\mathbb{N}_V=\Amat$</li>
             </ul>
 	  </section>
@@ -478,9 +521,8 @@ class Quad1d(object):
           <ul style="line-height:2.0;">
             <li>Works now:
               <ul style="line-height:1.25;">
-                <li>What</li>
-                <li>Foo</li>
-                <li>Bar</li>
+                <li>Framework for investigations of preconditioners in place</li>
+                <li>Suggested preconditioner, while not ideal, handles arbitrary number of beams</li>
               </ul>
             </li>
             <p>&nbsp;</p>
